@@ -1,0 +1,14 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <!-- 布局 -->
+    <!-- hight高度，size 大小，space留白 ，distance距离，radius圆角半径 -->
+    <!-- 状态栏高度 -->
+    <dimen name="hight_state_bar">24dp</dimen>
+    <!-- Appbar最小高度 -->
+    <dimen name="hight_app_bar">56dp</dimen>
+    <!-- 底部导航栏高度 -->
+    <dimen name="hight_tab_navigation">48dp</dimen>
+    <dimen name="ftx_dimen1dp">1dp</dimen>
+    <dimen name="ftx_dimen4dp">4dp</dimen>
+    <dimen name="ftx_dimen8dp">8dp</dimen>
+</resources>
