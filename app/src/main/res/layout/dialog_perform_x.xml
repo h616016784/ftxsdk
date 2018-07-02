@@ -35,11 +35,23 @@
             android:layout_height="match_parent"
             android:background="@color/transparent"/>
 
-        <ImageView
-            android:id="@+id/ftx_content_iv"
+        <RelativeLayout
+            android:id="@+id/ftx_content_image_rl"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/img_default"/>
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/ftx_content_iv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/img_default"/>
+            <ImageView
+                android:id="@+id/ftx_content_bt_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ease_video_play_btn_small_nor"/>
+        </RelativeLayout>
+
         <ProgressBar
             android:id="@+id/ftx_content_pb"
             android:visibility="gone"

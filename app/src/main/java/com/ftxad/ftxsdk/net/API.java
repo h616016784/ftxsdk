@@ -73,7 +73,9 @@ public class API implements APIConstants {
                             callback.ftxCallback(rspAdvert.getData());
                     }
                 }catch (Exception e){
-                    callback.ftxFailed(e.toString());
+                    Log.e("fantasyWfjs","onResponse");
+                    if (callback!=null)
+                        callback.ftxCallback(null);
                     e.printStackTrace();
                     Toast.makeText(mContext,e.toString(),Toast.LENGTH_SHORT).show();
                 }
@@ -81,6 +83,7 @@ public class API implements APIConstants {
 
             @Override
             public void onFailure(Call<RspAdvert> call, Throwable t) {
+                Log.e("fantasyWfjs","onFailure");
                 callback.ftxFailed(call.toString());
                 Toast.makeText(mContext,call.toString(),Toast.LENGTH_SHORT).show();
             }

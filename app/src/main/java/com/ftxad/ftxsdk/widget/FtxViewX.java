@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -43,7 +44,7 @@ import java.util.Locale;
 
 public class FtxViewX extends FrameLayout {
     private LinearLayout ftx_title_up_ll,ftx_title_down_ll;
-    private RelativeLayout ftx_content_rl,ftx_bottom_ll;
+    private RelativeLayout ftx_content_rl,ftx_bottom_ll,ftx_content_image_rl;
     private TextView ftx_title_up_tv,ftx_title_down_tv,ftx_bottom_name_tv,ftx_bottom_download_tv,ftx_bottom_advert_tv,ftx_content_time_tv,ftx_content_transparent_tv;
     private ImageView ftx_content_iv;
     private SurfaceView ftx_content_sv;
@@ -58,8 +59,10 @@ public class FtxViewX extends FrameLayout {
     private int video=0;//0是初始状态，1是正在播放中，2是播放完毕
     private boolean isFirstClick=true;// 是否是第一次点击
     private boolean isFirstPlay=true;// 是否是第一次播放视频
+    private int getAdavertTimes=1;
 
     private RspAdvert.DataBean myAdvert;
+    private FtxCompleteListener mFtxCompleteListener;
     public FtxViewX(Context context) {
         super(context);
         initView(context);
@@ -89,6 +92,7 @@ public class FtxViewX extends FrameLayout {
         ftx_content_rl=view.findViewById(R.id.ftx_content_rl);
         ftx_content_pb=view.findViewById(R.id.ftx_content_pb);
         ftx_content_transparent_tv=view.findViewById(R.id.ftx_content_transparent_tv);
+        ftx_content_image_rl=view.findViewById(R.id.ftx_content_image_rl);
 
 //        Uri rawUri=Uri.parse("android.resource://" + getPackageName(view.getContext()) + "/" + R.raw.shuai_dan_ge);
         prepareSurface();
@@ -96,51 +100,58 @@ public class FtxViewX extends FrameLayout {
     }
 
     private void getAdvertInfo() {
-        //显示 Loading 图
-        ftx_content_pb.setVisibility(View.VISIBLE);
-        API.getInstance(mContext).fantasyWfjs("2", new FtxCallback<RspAdvert.DataBean>() {
-            @Override
-            public void ftxCallback(RspAdvert.DataBean dataBean) {
-                //隐藏 Loading 图
-                ftx_content_pb.setVisibility(View.GONE);
-                if (dataBean!=null){
-                    myAdvert=dataBean;
-                    List<RspAdvert.DataBean.RelsMapBean.VideoPathBean> list=myAdvert.getRelsMap().getVideoPath();
-                    List<RspAdvert.DataBean.RelsMapBean.IntroduceStrBean> listIntroduce=myAdvert.getRelsMap().getIntroduceStr();
-                    List<RspAdvert.DataBean.RelsMapBean.CoverStrBean> listCoverStr=myAdvert.getRelsMap().getCoverStr();
+        if (getAdavertTimes<=3){
+            getAdavertTimes++;
+            //显示 Loading 图
+            ftx_content_pb.setVisibility(View.VISIBLE);
+            API.getInstance(mContext).fantasyWfjs("2", new FtxCallback<RspAdvert.DataBean>() {
+                @Override
+                public void ftxCallback(RspAdvert.DataBean dataBean) {
+                    //隐藏 Loading 图
+                    ftx_content_pb.setVisibility(View.GONE);
+                    if (dataBean!=null){
+                        Log.e("ftxCallback","ftxCallback");
+                        myAdvert=dataBean;
+                        List<RspAdvert.DataBean.RelsMapBean.VideoPathBean> list=myAdvert.getRelsMap().getVideoPath();
+                        List<RspAdvert.DataBean.RelsMapBean.IntroduceStrBean> listIntroduce=myAdvert.getRelsMap().getIntroduceStr();
+                        List<RspAdvert.DataBean.RelsMapBean.CoverStrBean> listCoverStr=myAdvert.getRelsMap().getCoverStr();
 
-                    ftx_bottom_name_tv.setText(myAdvert.getAdStuff().getPName());
-                    String title="";
-                    if (listIntroduce!=null){
-                        for (RspAdvert.DataBean.RelsMapBean.IntroduceStrBean bean:listIntroduce){
-                            title+=bean.getInfo();
+                        ftx_bottom_name_tv.setText(myAdvert.getAdStuff().getPName());
+                        String title="";
+                        if (listIntroduce!=null){
+                            for (RspAdvert.DataBean.RelsMapBean.IntroduceStrBean bean:listIntroduce){
+                                title+=bean.getInfo();
+                            }
                         }
-                    }
-                    ftx_title_down_tv.setText(title);
-                    String url="";
-                    if (list!=null){
-                        url =list.get(0).getInfo();
-                        Uri rawUri=Uri.parse(url);
-                        startPlayVideo(rawUri);
+                        ftx_title_down_tv.setText(title);
+                        String url="";
+                        if (list!=null){
+                            url =list.get(0).getInfo();
+                            Uri rawUri=Uri.parse(url);
+                            startPlayVideo(rawUri);
 //                        ftx_content_vv.setVideoURI(rawUri);
-                    }
-                    String imageUrl="";
-                    if (listCoverStr!=null){
-                        imageUrl=listCoverStr.get(0).getInfo();
-                        Glide.with(mContext)
-                                .load(imageUrl)
-                                .error(R.drawable.img_default)
-                                .into(ftx_content_iv);
+                        }
+                        String imageUrl="";
+                        if (listCoverStr!=null){
+                            imageUrl=listCoverStr.get(0).getInfo();
+                            Glide.with(mContext)
+                                    .load(imageUrl)
+                                    .error(R.drawable.img_default)
+                                    .into(ftx_content_iv);
+                        }
+                    }else {
+                        Log.e("ftxCallback","null");
+                        getAdvertInfo();
                     }
                 }
-            }
 
-            @Override
-            public void ftxFailed(String msg) {
-                //隐藏 Loading 图
-                ftx_content_pb.setVisibility(View.GONE);
-            }
-        });
+                @Override
+                public void ftxFailed(String msg) {
+                    //隐藏 Loading 图
+                    ftx_content_pb.setVisibility(View.GONE);
+                }
+            });
+        }
     }
 
 
@@ -177,6 +188,7 @@ public class FtxViewX extends FrameLayout {
                 jumpToClick();
             }
         });
+
     }
 
     /**
@@ -184,8 +196,8 @@ public class FtxViewX extends FrameLayout {
      */
     private void jumpToClick() {
         if (myAdvert!=null){
-            openUrl();
             API.getInstance(mContext).addJsCNum(myAdvert);
+            openUrl();
         }
     }
     private void openUrl(){
@@ -279,6 +291,17 @@ public class FtxViewX extends FrameLayout {
     public void pause(){
         mediaPlayer.pause();
     }
+    public void release(){
+        // surfaceView销毁
+        // 如果MediaPlayer没被销毁，则销毁mediaPlayer
+        if (null != mediaPlayer) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+    public void setOnFtxCompleteListener(FtxCompleteListener listener){
+        this.mFtxCompleteListener=listener;
+    }
 
     private void startVideo() {
         mediaPlayer.start();
@@ -291,36 +314,52 @@ public class FtxViewX extends FrameLayout {
         }
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             // SurfaceView的大小改变
+
         }
 
         public void surfaceCreated(SurfaceHolder holder) {
             // surfaceView被创建
             // 设置播放资源
+            Log.e("surfaceCreated",video+"");
+//            if (video==1){
+//                mediaPlayer.start();
+//            }else {
+//
+//            }
+            getAdavertTimes=1;
             getAdvertInfo();
-
         }
 
         public void surfaceDestroyed(SurfaceHolder holder) {
-            // surfaceView销毁
-            // 如果MediaPlayer没被销毁，则销毁mediaPlayer
-            if (null != mediaPlayer) {
-                mediaPlayer.release();
-                mediaPlayer = null;
-            }
+            Log.e("surfaceDestroyed",video+"");
         }
     }
     private MediaPlayer.OnCompletionListener onCompletionListener=new MediaPlayer.OnCompletionListener() {
         @Override
-        public void onCompletion(MediaPlayer mediaPlayer) {
+        public void onCompletion(final MediaPlayer mediaPlayer) {
+            Log.e("OnCompletionListener","OnCompletionListener");
             video=2;
-            ftx_content_iv.setVisibility(View.VISIBLE);
+            ftx_content_image_rl.setVisibility(View.VISIBLE);
+            ftx_content_image_rl.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.e("onClick","ftx_content_image_rl.setOnClickListener");
+                    ftx_content_image_rl.setVisibility(View.GONE);
+                    // 播放视频
+                    startVideo();
+                }
+            });
+//            ftx_content_iv.setVisibility(View.VISIBLE);
+            if (mFtxCompleteListener!=null)
+                mFtxCompleteListener.OnFtxCompleteListener();
         }
     };
     private MediaPlayer.OnPreparedListener onPreparedListener=new MediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(MediaPlayer mediaPlayer) {
             //隐藏默认头像
-            ftx_content_iv.setVisibility(View.GONE);
+            ftx_content_image_rl.setVisibility(View.GONE);
+//            ftx_content_iv.setVisibility(View.GONE);
             // 设置显示到屏幕
             mediaPlayer.setDisplay(surfaceHolder);
             // 设置surfaceView保持在屏幕上
@@ -349,4 +388,7 @@ public class FtxViewX extends FrameLayout {
 
         }
     };
+    public interface FtxCompleteListener{
+        void OnFtxCompleteListener();
+    }
 }
