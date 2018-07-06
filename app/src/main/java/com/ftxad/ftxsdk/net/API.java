@@ -77,7 +77,7 @@ public class API implements APIConstants {
                     if (callback!=null)
                         callback.ftxCallback(null);
                     e.printStackTrace();
-                    Toast.makeText(mContext,e.toString(),Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(mContext,e.toString(),Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -96,8 +96,8 @@ public class API implements APIConstants {
      */
     public void  addJsENum(RspAdvert.DataBean bean){
         Map<String,String> map=new HashMap<>();
-        map.put("orderId",bean.getOrderId());
-        map.put("stuffId",bean.getAdStuff().getId()+"");
+        map.put("orderId",bean.getOrderId()+"");
+        map.put("stuffId",bean.getAdStuffOffer().getSId()+"");
         map.put("device","2");
         map.put("type","2");
         map.put("adPriceSortId",bean.getAdPriceSortId());
@@ -122,8 +122,8 @@ public class API implements APIConstants {
      */
     public void addJsCNum(RspAdvert.DataBean bean){
         Map<String,String> map=new HashMap<>();
-        map.put("orderId",bean.getOrderId());
-        map.put("stuffId",bean.getAdStuff().getId()+"");
+        map.put("orderId",bean.getOrderId()+"");
+        map.put("stuffId",bean.getAdStuffOffer().getSId()+"");
         map.put("device","2");
         map.put("type","2");
         map.put("adPriceSortId",bean.getAdPriceSortId());

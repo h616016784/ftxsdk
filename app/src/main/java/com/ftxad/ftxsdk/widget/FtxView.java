@@ -109,36 +109,36 @@ public class FtxView extends FrameLayout {
             @Override
             public void ftxCallback(RspAdvert.DataBean dataBean) {
                 //隐藏 Loading 图
-                ftx_content_pb.setVisibility(View.GONE);
-                if (dataBean!=null){
-                    myAdvert=dataBean;
-                    List<RspAdvert.DataBean.RelsMapBean.VideoPathBean> list=myAdvert.getRelsMap().getVideoPath();
-                    List<RspAdvert.DataBean.RelsMapBean.IntroduceStrBean> listIntroduce=myAdvert.getRelsMap().getIntroduceStr();
-                    List<RspAdvert.DataBean.RelsMapBean.CoverStrBean> listCoverStr=myAdvert.getRelsMap().getCoverStr();
-
-                    ftx_bottom_name_tv.setText(myAdvert.getAdStuff().getPName());
-                    String title="";
-                    if (listIntroduce!=null){
-                        for (RspAdvert.DataBean.RelsMapBean.IntroduceStrBean bean:listIntroduce){
-                            title+=bean.getInfo();
-                        }
-                    }
-                    ftx_title_down_tv.setText(title);
-                    String url="";
-                    if (list!=null){
-                        url =list.get(0).getInfo();
-                        Uri rawUri=Uri.parse(url);
-                        ftx_content_vv.setVideoURI(rawUri);
-                    }
-                    String imageUrl="";
-                    if (listCoverStr!=null){
-                        imageUrl=listCoverStr.get(0).getInfo();
-                        Glide.with(mContext)
-                                .load(imageUrl)
-                                .error(R.drawable.img_default)
-                                .into(ftx_content_iv);
-                    }
-                }
+//                ftx_content_pb.setVisibility(View.GONE);
+//                if (dataBean!=null){
+//                    myAdvert=dataBean;
+//                    List<RspAdvert.DataBean.RelsMapBean.VideoPathBean> list=myAdvert.getRelsMap().getVideoPath();
+//                    List<RspAdvert.DataBean.RelsMapBean.IntroduceStrBean> listIntroduce=myAdvert.getRelsMap().getIntroduceStr();
+//                    List<RspAdvert.DataBean.RelsMapBean.CoverStrBean> listCoverStr=myAdvert.getRelsMap().getCoverStr();
+//
+//                    ftx_bottom_name_tv.setText(myAdvert.getAdStuff().getPName());
+//                    String title="";
+//                    if (listIntroduce!=null){
+//                        for (RspAdvert.DataBean.RelsMapBean.IntroduceStrBean bean:listIntroduce){
+//                            title+=bean.getInfo();
+//                        }
+//                    }
+//                    ftx_title_down_tv.setText(title);
+//                    String url="";
+//                    if (list!=null){
+//                        url =list.get(0).getInfo();
+//                        Uri rawUri=Uri.parse(url);
+//                        ftx_content_vv.setVideoURI(rawUri);
+//                    }
+//                    String imageUrl="";
+//                    if (listCoverStr!=null){
+//                        imageUrl=listCoverStr.get(0).getInfo();
+//                        Glide.with(mContext)
+//                                .load(imageUrl)
+//                                .error(R.drawable.img_default)
+//                                .into(ftx_content_iv);
+//                    }
+//                }
             }
 
             @Override
@@ -184,12 +184,12 @@ public class FtxView extends FrameLayout {
         }
     }
     private void openUrl(){
-        String url=myAdvert.getAdStuff().getUrl();
-        if (!TextUtils.isEmpty(url)){
-            Uri uri=Uri.parse(url);
-            Intent intent=new Intent(Intent.ACTION_VIEW,uri);
-            mContext.startActivity(intent);
-        }
+//        String url=myAdvert.getAdStuff().getUrl();
+//        if (!TextUtils.isEmpty(url)){
+//            Uri uri=Uri.parse(url);
+//            Intent intent=new Intent(Intent.ACTION_VIEW,uri);
+//            mContext.startActivity(intent);
+//        }
 
     }
 

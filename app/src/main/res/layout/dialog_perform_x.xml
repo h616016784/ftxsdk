@@ -38,7 +38,7 @@
         <RelativeLayout
             android:id="@+id/ftx_content_image_rl"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
             <ImageView
                 android:id="@+id/ftx_content_iv"
                 android:layout_width="match_parent"
@@ -49,6 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:visibility="gone"
                 android:src="@drawable/ease_video_play_btn_small_nor"/>
         </RelativeLayout>
 

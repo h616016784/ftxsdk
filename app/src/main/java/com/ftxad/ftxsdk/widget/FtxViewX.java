@@ -16,11 +16,9 @@ import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -46,7 +44,7 @@ public class FtxViewX extends FrameLayout {
     private LinearLayout ftx_title_up_ll,ftx_title_down_ll;
     private RelativeLayout ftx_content_rl,ftx_bottom_ll,ftx_content_image_rl;
     private TextView ftx_title_up_tv,ftx_title_down_tv,ftx_bottom_name_tv,ftx_bottom_download_tv,ftx_bottom_advert_tv,ftx_content_time_tv,ftx_content_transparent_tv;
-    private ImageView ftx_content_iv;
+    private ImageView ftx_content_iv,ftx_content_bt_iv;
     private SurfaceView ftx_content_sv;
     private SurfaceHolder surfaceHolder;
     private MediaPlayer mediaPlayer;
@@ -93,6 +91,7 @@ public class FtxViewX extends FrameLayout {
         ftx_content_pb=view.findViewById(R.id.ftx_content_pb);
         ftx_content_transparent_tv=view.findViewById(R.id.ftx_content_transparent_tv);
         ftx_content_image_rl=view.findViewById(R.id.ftx_content_image_rl);
+        ftx_content_bt_iv=view.findViewById(R.id.ftx_content_bt_iv);
 
 //        Uri rawUri=Uri.parse("android.resource://" + getPackageName(view.getContext()) + "/" + R.raw.shuai_dan_ge);
         prepareSurface();
@@ -107,33 +106,26 @@ public class FtxViewX extends FrameLayout {
             API.getInstance(mContext).fantasyWfjs("2", new FtxCallback<RspAdvert.DataBean>() {
                 @Override
                 public void ftxCallback(RspAdvert.DataBean dataBean) {
-                    //隐藏 Loading 图
-                    ftx_content_pb.setVisibility(View.GONE);
+
                     if (dataBean!=null){
                         Log.e("ftxCallback","ftxCallback");
                         myAdvert=dataBean;
-                        List<RspAdvert.DataBean.RelsMapBean.VideoPathBean> list=myAdvert.getRelsMap().getVideoPath();
-                        List<RspAdvert.DataBean.RelsMapBean.IntroduceStrBean> listIntroduce=myAdvert.getRelsMap().getIntroduceStr();
-                        List<RspAdvert.DataBean.RelsMapBean.CoverStrBean> listCoverStr=myAdvert.getRelsMap().getCoverStr();
+                        String url = myAdvert.getAdStuffOffer().getVideoPath();
+                        String listIntroduce=myAdvert.getAdStuffOffer().getIntroduction();
+                        String imageUrl = myAdvert.getAdStuffOffer().getImgPath();
 
-                        ftx_bottom_name_tv.setText(myAdvert.getAdStuff().getPName());
+                        ftx_bottom_name_tv.setText(myAdvert.getAdStuffOffer().getPName());
                         String title="";
-                        if (listIntroduce!=null){
-                            for (RspAdvert.DataBean.RelsMapBean.IntroduceStrBean bean:listIntroduce){
-                                title+=bean.getInfo();
-                            }
+                        if (!TextUtils.isEmpty(listIntroduce)){
+                            ftx_title_down_tv.setText(title);
                         }
-                        ftx_title_down_tv.setText(title);
-                        String url="";
-                        if (list!=null){
-                            url =list.get(0).getInfo();
+
+                        if (!TextUtils.isEmpty(url)){
                             Uri rawUri=Uri.parse(url);
                             startPlayVideo(rawUri);
 //                        ftx_content_vv.setVideoURI(rawUri);
                         }
-                        String imageUrl="";
-                        if (listCoverStr!=null){
-                            imageUrl=listCoverStr.get(0).getInfo();
+                        if (!TextUtils.isEmpty(url)){
                             Glide.with(mContext)
                                     .load(imageUrl)
                                     .error(R.drawable.img_default)
@@ -166,16 +158,7 @@ public class FtxViewX extends FrameLayout {
     }
 
     private void addListener() {
-        ftx_content_transparent_tv.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isFirstClick){
-                    isFirstClick=false;
-                }else {
-                    jumpToClick();
-                }
-            }
-        });
+
         ftx_title_up_ll.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -201,7 +184,7 @@ public class FtxViewX extends FrameLayout {
         }
     }
     private void openUrl(){
-        String url=myAdvert.getAdStuff().getUrl();
+        String url=myAdvert.getAdStuffOffer().getUrl();
         if (!TextUtils.isEmpty(url)){
             Uri uri=Uri.parse(url);
             Intent intent=new Intent(Intent.ACTION_VIEW,uri);
@@ -332,6 +315,10 @@ public class FtxViewX extends FrameLayout {
 
         public void surfaceDestroyed(SurfaceHolder holder) {
             Log.e("surfaceDestroyed",video+"");
+            if(mediaPlayer!=null){
+                mediaPlayer.release();
+                mediaPlayer=null;
+            }
         }
     }
     private MediaPlayer.OnCompletionListener onCompletionListener=new MediaPlayer.OnCompletionListener() {
@@ -340,6 +327,7 @@ public class FtxViewX extends FrameLayout {
             Log.e("OnCompletionListener","OnCompletionListener");
             video=2;
             ftx_content_image_rl.setVisibility(View.VISIBLE);
+            ftx_content_bt_iv.setVisibility(View.VISIBLE);
             ftx_content_image_rl.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -357,6 +345,8 @@ public class FtxViewX extends FrameLayout {
     private MediaPlayer.OnPreparedListener onPreparedListener=new MediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(MediaPlayer mediaPlayer) {
+            //隐藏 Loading 图
+            ftx_content_pb.setVisibility(View.GONE);
             //隐藏默认头像
             ftx_content_image_rl.setVisibility(View.GONE);
 //            ftx_content_iv.setVisibility(View.GONE);
@@ -372,6 +362,16 @@ public class FtxViewX extends FrameLayout {
             // 播放视频
             startVideo();
 
+            ftx_content_transparent_tv.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isFirstClick){
+                        isFirstClick=false;
+                    }else {
+                        jumpToClick();
+                    }
+                }
+            });
         }
     };
 
